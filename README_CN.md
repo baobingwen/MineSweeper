@@ -1,8 +1,8 @@
 # MineSweeper
 
-The Game Mine Sweeper by pygame
+用pygame库制作的扫雷游戏
 
-## Version Info
+## 程序版本信息
 
 ```
 python == 3.8.16

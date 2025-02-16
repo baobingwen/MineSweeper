@@ -169,3 +169,13 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+
+.history/
+
+test/*
+
+game_records.json
+
+image/原图/*
