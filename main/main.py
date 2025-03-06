@@ -735,6 +735,10 @@ class MineArea():
                 x = (event.pos[1] - self.mine_sweep_top) // (self.cell_side_length + self.cell_gap)
                 print(x,y,event.pos)
                 
+                # 检查坐标是否在有效范围内
+                if x < 0 or x >= len(self.mine_cover_board) or y < 0 or y >= len(self.mine_cover_board[0]):
+                    return
+                
                 # 左键被标记覆盖层，无反应
                 if self.mine_cover_board[x][y] == '1':
                     return
@@ -946,7 +950,7 @@ class MineSweeper():
         # 初始化游戏
         pygame.display.set_caption('MineSweeper')
         
-        icon = assets.images['icon']  # 替换为你的图标文件路径
+        icon = assets.images['icon']
         pygame.display.set_icon(icon)
         
         self.screen = pygame.display.set_mode((self.display_width,self.display_height))
