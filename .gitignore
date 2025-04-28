@@ -10,7 +10,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-#dist/
+dist/
 downloads/
 eggs/
 .eggs/
@@ -170,12 +170,9 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-
-
+# other
+.gitignore
 .history/
-
-test/*
-
+test/
 game_records.json
-
-image/原图/*
+images/原图/

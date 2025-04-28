@@ -106,7 +106,7 @@ class Config:
     }
 
     # ---------- 图片路径 ----------
-    IMAGE_DIR = Path("./image")
+    IMAGE_DIR = Path("./images")
     IMAGE_PATHS = {
         # restart button
         "restart_normal": IMAGE_DIR / "face0.png",
