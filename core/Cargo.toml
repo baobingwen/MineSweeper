@@ -1,0 +1,30 @@
+[package]
+name = "core"
+version = "0.1.0"
+edition = "2024"
+authors = ["bbw <bbw20110110@163.com>"]
+description = "Minesweeper game logic core in Rust"
+license = "MIT/Apache-2.0"
+
+[lib]
+name = "core"
+crate-type = ["cdylib", "rlib"]  # 动态库、静态库
+
+[dependencies]
+rand = { version = "0.9.1"}
+
+# 条件依赖管理，生成Python时在非WASM平台生效
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+pyo3 = { version = "0.25.0", features = ["extension-module"], optional = true }
+
+# WASM的依赖
+[target.'cfg(target_family = "wasm")'.dependencies]
+wasm-bindgen = { version = "0.2.100", optional = true }
+js-sys = { version = "0.3.77", optional = true }
+getrandom = { version = "0.3.3", features = ["wasm_js"] }
+
+# 特性标志定义
+[features]
+default = []
+python = ["dep:pyo3"]    # 通过 --features python 启用PyO3
+wasm = ["dep:wasm-bindgen", "dep:js-sys"]  # 通过 --features wasm 启用WASM
