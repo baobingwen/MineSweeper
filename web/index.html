@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASM Minesweeper</title>
+    <style>
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 2px;
+            background: #ccc;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            border: 1px solid #999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cell.revealed {
+            background: #e0e0e0;
+            cursor: default;
+        }
+
+        .mine {
+            background: #ff0000 !important;
+        }
+
+        .status {
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="status" id="status">Playing...</div>
+        <div class="grid" id="grid"></div>
+        <button id="restart">New Game</button>
+    </div>
+
+    <script type="module">
+        import init, { MineSweeperCoreWasm } from './core.js';
+
+        class Game {
+            constructor(rows = 9, cols = 9, mines = 10) {
+                this.rows = rows;
+                this.cols = cols;
+                this.mines = mines;
+                this.core = null;
+                this.initGame();
+            }
+
+            async initGame() {
+                await init();
+                this.core = new MineSweeperCoreWasm(this.rows, this.cols, this.mines);
+                this.renderGrid();
+            }
+
+            renderGrid() {
+                const grid = document.getElementById('grid');
+                grid.style.gridTemplate = `repeat(${this.rows}, 30px) / repeat(${this.cols}, 30px)`;
+                grid.innerHTML = '';
+
+                const visibleBoard = this.core.getVisibleBoard();
+                for (let i = 0; i < this.rows; i++) {
+                    for (let j = 0; j < this.cols; j++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.dataset.row = i;
+                        cell.dataset.col = j;
+                        
+                        const value = visibleBoard[i][j];
+                        
+                        if (value === -1) {
+                            cell.classList.add('mine');
+                            cell.textContent = '💣';
+                        } else if (value !== -2) {
+                            cell.classList.add('revealed');}
+                            if (value > 0) {
+                            cell.textContent = value;
+                        }
+
+                        cell.addEventListener('click', () => this.handleClick(i, j));
+                        grid.appendChild(cell);
+                    }
+                }
+
+                this.updateStatus();
+            }
+
+            handleClick(row, col) {
+                if (this.core.getGameState() !== 0) return;
+                
+                this.core.openCell(row, col);
+                this.renderGrid();
+            }
+
+            updateStatus() {
+                const status = document.getElementById('status');
+                const state = this.core.getGameState();
+                
+                switch(state) {
+                    case -1:
+                        status.textContent = 'Game Over!';
+                        break;
+                    case 1:
+                        status.textContent = 'You Win!';
+                        break;
+                    default:
+                        status.textContent = 'Playing...';
+                }
+            }
+
+            restart() {
+                this.core.reset();
+                this.renderGrid();
+            }
+        }
+
+        // Initialize game
+        let game = new Game(9, 9, 10);
+
+        // Restart button
+        document.getElementById('restart').addEventListener('click', () => {
+            game.restart();
+        });
+    </script>
+</body>
+</html>
